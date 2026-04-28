@@ -10,6 +10,6 @@ int main() {
 
     Polinomio pol = criarPolinomio(terms);
 
-    destroiPolinomio(pol);
+    destroiPolinomio(&pol);
     return 0;
 }

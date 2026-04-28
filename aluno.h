@@ -12,7 +12,7 @@ typedef struct {
 
 Polinomio criarPolinomio(int size);
 
-void destroiPolinomio(Polinomio self);
+void destroiPolinomio(Polinomio *self);
 
 void avaliarPolinomio(Polinomio self);
 
