@@ -16,6 +16,6 @@ void destroiPolinomio(Polinomio self);
 
 void avaliarPolinomio(Polinomio self);
 
-void derivarPolinomio(Polinomio self);
+Polinomio derivarPolinomio(Polinomio self);
 
 void analisarPolinomio(Polinomio self);
