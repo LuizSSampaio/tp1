@@ -1,0 +1,5 @@
+Polinomio: 1.00x^4+1.00x^3-2.00x^2+3.00
+Derivada: 4.00x^3+3.00x^2-4.00x
+Intervalos de crescimento: [-1.40, 0.00] [0.70, 1.00] 
+Intervalos de decrescimento: [-2.00, -1.50] [0.00, 0.60] 
+Pontos de transicao: [-1.50, -1.40] [0.00, 0.00] [0.60, 0.70] 
