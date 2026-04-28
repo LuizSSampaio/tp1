@@ -17,6 +17,11 @@ int main() {
             return -1;
         }
 
+        if (terms == 1 && exp == 0) {
+            printf("Funcao constante em y = %.2f.", (double)coe);
+            return 0;
+        }
+
         if (exp < 0) {
             printf("Erro: expoente negativo.");
             return 0;
