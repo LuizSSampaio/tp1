@@ -26,6 +26,13 @@ int main() {
         pol.termos[i].expoente = exp;
     }
 
+    double startRange, endRange;
+    if (scanf("%lf%lf", &startRange, &endRange) == -1) {
+        printf("Falha ao ler intervalo.\n");
+        return -1;
+    }
+    imprimirDados(&pol, startRange, endRange);
+
     destroiPolinomio(&pol);
     return 0;
 }

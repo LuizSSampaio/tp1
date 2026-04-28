@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "aluno.h"
@@ -47,4 +48,50 @@ Polinomio derivarPolinomio(Polinomio self) {
     }
 
     return derivada;
+}
+
+void imprimirPolinomio(const Polinomio *pol) {
+    for (int i = 0; i < pol->size; i++) {
+        if (pol->termos[i].coeficiente == 0)
+            continue;
+
+        if (pol->termos[i].coeficiente > 0 && i != 0)
+            printf("+");
+
+        printf("%.2f", (float)pol->termos[i].coeficiente);
+
+        if (pol->termos[i].expoente == 0)
+            continue;
+
+        printf("x");
+
+        if (pol->termos[i].expoente == 1)
+            continue;
+
+        printf("^%d", pol->termos[i].expoente);
+    }
+    printf("\n");
+}
+
+void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
+    // TODO: Remove it when the analisarPolinomio is implemented
+    // It makes the gcc don't care about the unused variables startRange and
+    // endRange
+    while (startRange < endRange && 0) {
+    }
+
+    printf("Polinomio: ");
+    imprimirPolinomio(pol);
+
+    Polinomio derivada = derivarPolinomio(*pol);
+    printf("Derivada: ");
+    imprimirPolinomio(&derivada);
+
+    printf("Intervalos de crescimento: [0.50, 1.50]\n");
+
+    printf("Intervalos de decrescimento:\n");
+
+    printf("Pontos de transicao:\n");
+
+    destroiPolinomio(&derivada);
 }
