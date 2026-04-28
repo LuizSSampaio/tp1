@@ -3,19 +3,19 @@
 typedef struct {
     int coeficiente;
     int expoente;
-
 } Termo;
 
 typedef struct {
     Termo *termos;
+    int size;
 } Polinomio;
 
-Polinomio criarPolinomio();
+Polinomio criarPolinomio(int size);
 
-void destroiPolinomio();
+void destroiPolinomio(Polinomio self);
 
-void avaliarPolinomio();
+void avaliarPolinomio(Polinomio self);
 
-void derivarPolinomio();
+void derivarPolinomio(Polinomio self);
 
-void analisarPolinomio();
+void analisarPolinomio(Polinomio self);
