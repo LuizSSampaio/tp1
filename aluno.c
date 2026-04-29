@@ -51,24 +51,31 @@ Polinomio derivarPolinomio(Polinomio self) {
 }
 
 void imprimirPolinomio(const Polinomio *pol) {
+    int printed_any = 0;
+
     for (int i = 0; i < pol->size; i++) {
         if (pol->termos[i].coeficiente == 0)
             continue;
 
-        if (pol->termos[i].coeficiente > 0 && i != 0)
+        if (pol->termos[i].coeficiente > 0 && printed_any)
             printf("+");
 
         printf("%.2f", (float)pol->termos[i].coeficiente);
 
-        if (pol->termos[i].expoente == 0)
+        if (pol->termos[i].expoente == 0) {
+            printed_any = 1;
             continue;
+        }
 
         printf("x");
 
-        if (pol->termos[i].expoente == 1)
+        if (pol->termos[i].expoente == 1) {
+            printed_any = 1;
             continue;
+        }
 
         printf("^%d", pol->termos[i].expoente);
+        printed_any = 1;
     }
     printf("\n");
 }
