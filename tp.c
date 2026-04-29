@@ -4,7 +4,7 @@
 
 int main() {
     int terms;
-    if (scanf("%d", &terms) == -1) {
+    if (scanf("%d", &terms) != 1 || terms < 0) {
         printf("Falha ao ler a quantidade de termos\n");
         return -1;
     }
@@ -12,7 +12,7 @@ int main() {
     Polinomio pol = criarPolinomio(terms);
     for (int i = 0; i < terms; i++) {
         int coe, exp;
-        if (scanf("%d%d", &coe, &exp) == -1) {
+        if (scanf("%d%d", &coe, &exp) != 2) {
             printf("Falha ao ler termos\n");
             destroiPolinomio(&pol);
             return -1;
@@ -27,7 +27,7 @@ int main() {
         if (exp < 0) {
             printf("Erro: expoente negativo.");
             destroiPolinomio(&pol);
-            return 0;
+            return -1;
         }
 
         pol.termos[i].coeficiente = coe;
