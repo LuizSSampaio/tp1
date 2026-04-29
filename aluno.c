@@ -123,7 +123,8 @@ void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
         points[num_pts++] = p;
         k++;
     }
-    if (num_pts == 0 || fabs(points[num_pts - 1] - endRange) > EPS)
+    if ((num_pts == 0 || fabs(points[num_pts - 1] - endRange) > EPS) &&
+        num_pts < MAX_PTS)
         points[num_pts++] = endRange;
 
     /* Evaluate derivative at each point */
