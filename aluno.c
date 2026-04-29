@@ -97,22 +97,66 @@ void imprimirPolinomio(const Polinomio *pol) {
     printf("\n");
 }
 
-void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
-    Polinomio derivada = derivarPolinomio(*pol);
+/* Recursive: scan grid points and collect transition intervals */
+static void coletarTransicoes(const double *points, const double *dvals,
+                               int i, int num_pts,
+                               Intervalo *trans, int *n_trans) {
+    if (i >= num_pts)
+        return;
+
+    if (fabs(dvals[i]) < EPS) {
+        trans[*n_trans].start = points[i];
+        trans[(*n_trans)++].end = points[i];
+    } else if (i > 0 && fabs(dvals[i - 1]) >= EPS) {
+        int sp = (dvals[i - 1] > 0) ? 1 : -1;
+        int sc = (dvals[i] > 0) ? 1 : -1;
+        if (sp != sc) {
+            trans[*n_trans].start = points[i - 1];
+            trans[(*n_trans)++].end = points[i];
+        }
+    }
+
+    coletarTransicoes(points, dvals, i + 1, num_pts, trans, n_trans);
+}
+
+/* Recursive: fill monotonic regions in the gaps between transitions */
+static void coletarRegioes(const Polinomio *der,
+                            const Intervalo *trans, int j, int n_trans,
+                            double endRange,
+                            Intervalo *cresc, int *n_cresc,
+                            Intervalo *decresc, int *n_decresc,
+                            double prev_end) {
+    double r_start = prev_end;
+    double r_end = (j < n_trans) ? trans[j].start : endRange;
+
+    if (r_end - r_start > EPS) {
+        double mid = (r_start + r_end) / 2.0;
+        double d = evalPol(der, mid);
+        if (d > EPS) {
+            cresc[*n_cresc].start = r_start;
+            cresc[(*n_cresc)++].end = r_end;
+        } else if (d < -EPS) {
+            decresc[*n_decresc].start = r_start;
+            decresc[(*n_decresc)++].end = r_end;
+        }
+    }
+
+    if (j < n_trans)
+        coletarRegioes(der, trans, j + 1, n_trans, endRange,
+                       cresc, n_cresc, decresc, n_decresc, trans[j].end);
+}
+
+void analisarPolinomio(Polinomio self, double startRange, double endRange) {
+    Polinomio derivada = derivarPolinomio(self);
 
     if (derivada.size == 0) {
-        double value = evalPol(pol, 0.0);
+        double value = evalPol(&self, 0.0);
         printf("Funcao constante em y = %.2f.\n", value);
         destroiPolinomio(&derivada);
         return;
     }
 
-    printf("Polinomio: ");
-    imprimirPolinomio(pol);
-    printf("Derivada: ");
-    imprimirPolinomio(&derivada);
-
-    /* Build list of evaluation points: 0.1-step grid plus endpoint if off-grid */
+    /* Build grid of evaluation points */
     double points[MAX_PTS];
     int num_pts = 0;
     int k = 0;
@@ -127,62 +171,23 @@ void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
         num_pts < MAX_PTS)
         points[num_pts++] = endRange;
 
-    /* Evaluate derivative at each point */
+    /* Evaluate derivative at each grid point */
     double dvals[MAX_PTS];
     for (int i = 0; i < num_pts; i++)
         dvals[i] = evalPol(&derivada, points[i]);
 
-    /* Identify transitions: zero-derivative points and sign-change sub-intervals */
+    /* Collect transitions recursively */
     Intervalo trans[MAX_PTS];
     int n_trans = 0;
-    for (int i = 0; i < num_pts; i++) {
-        if (fabs(dvals[i]) < EPS) {
-            Intervalo t;
-            t.start = points[i];
-            t.end = points[i];
-            trans[n_trans++] = t;
-        } else if (i > 0 && fabs(dvals[i - 1]) >= EPS) {
-            int sp = (dvals[i - 1] > 0) ? 1 : -1;
-            int sc = (dvals[i] > 0) ? 1 : -1;
-            if (sp != sc) {
-                Intervalo t;
-                t.start = points[i - 1];
-                t.end = points[i];
-                trans[n_trans++] = t;
-            }
-        }
-    }
+    coletarTransicoes(points, dvals, 0, num_pts, trans, &n_trans);
 
-    /* Build monotonic regions in the gaps between transitions */
+    /* Collect monotonic regions recursively */
     Intervalo cresc[MAX_PTS];
     int n_cresc = 0;
     Intervalo decresc[MAX_PTS];
     int n_decresc = 0;
-
-    double prev_end = startRange;
-    for (int j = 0; j <= n_trans; j++) {
-        double r_start = prev_end;
-        double r_end = (j < n_trans) ? trans[j].start : endRange;
-
-        if (r_end - r_start > EPS) {
-            double mid = (r_start + r_end) / 2.0;
-            double d = evalPol(&derivada, mid);
-            if (d > EPS) {
-                Intervalo r;
-                r.start = r_start;
-                r.end = r_end;
-                cresc[n_cresc++] = r;
-            } else if (d < -EPS) {
-                Intervalo r;
-                r.start = r_start;
-                r.end = r_end;
-                decresc[n_decresc++] = r;
-            }
-        }
-
-        if (j < n_trans)
-            prev_end = trans[j].end;
-    }
+    coletarRegioes(&derivada, trans, 0, n_trans, endRange,
+                   cresc, &n_cresc, decresc, &n_decresc, startRange);
 
     /* Print results */
     printf("Intervalos de crescimento: ");
@@ -204,4 +209,22 @@ void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
     printf("\n");
 
     destroiPolinomio(&derivada);
+}
+
+void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
+    Polinomio derivada = derivarPolinomio(*pol);
+
+    if (derivada.size == 0) {
+        destroiPolinomio(&derivada);
+        analisarPolinomio(*pol, startRange, endRange);
+        return;
+    }
+
+    printf("Polinomio: ");
+    imprimirPolinomio(pol);
+    printf("Derivada: ");
+    imprimirPolinomio(&derivada);
+    destroiPolinomio(&derivada);
+
+    analisarPolinomio(*pol, startRange, endRange);
 }

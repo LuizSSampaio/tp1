@@ -18,6 +18,6 @@ void avaliarPolinomio(Polinomio self);
 
 Polinomio derivarPolinomio(Polinomio self);
 
-void analisarPolinomio(Polinomio self);
+void analisarPolinomio(Polinomio self, double startRange, double endRange);
 
 void imprimirDados(const Polinomio *pol, double startRange, double endRange);
