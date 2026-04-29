@@ -1,7 +1,7 @@
 #pragma once
 
 typedef struct {
-    int coeficiente;
+    double coeficiente;
     int expoente;
 } Termo;
 

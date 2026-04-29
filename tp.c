@@ -4,7 +4,7 @@
 
 int main() {
     int terms;
-    if (scanf("%d", &terms) == -1) {
+    if (scanf("%d", &terms) != 1) {
         printf("Falha ao ler a quantidade de termos\n");
         return -1;
     }
@@ -13,7 +13,7 @@ int main() {
     for (int i = 0; i < terms; i++) {
         double coe;
         int exp;
-        if (scanf("%lf%d", &coe, &exp) == -1) {
+        if (scanf("%lf%d", &coe, &exp) != 2) {
             printf("Falha ao ler termos\n");
             destroiPolinomio(&pol);
             return -1;
@@ -30,8 +30,9 @@ int main() {
     }
 
     double startRange, endRange;
-    if (scanf("%lf%lf", &startRange, &endRange) == -1) {
+    if (scanf("%lf%lf", &startRange, &endRange) != 2) {
         printf("Falha ao ler intervalo.\n");
+        destroiPolinomio(&pol);
         return -1;
     }
     imprimirDados(&pol, startRange, endRange);
