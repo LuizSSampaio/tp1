@@ -11,8 +11,9 @@ int main() {
 
     Polinomio pol = criarPolinomio(terms);
     for (int i = 0; i < terms; i++) {
-        int coe, exp;
-        if (scanf("%d%d", &coe, &exp) == -1) {
+        double coe;
+        int exp;
+        if (scanf("%lf%d", &coe, &exp) == -1) {
             printf("Falha ao ler termos\n");
             return -1;
         }
