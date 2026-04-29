@@ -14,16 +14,19 @@ int main() {
         int coe, exp;
         if (scanf("%d%d", &coe, &exp) == -1) {
             printf("Falha ao ler termos\n");
+            destroiPolinomio(&pol);
             return -1;
         }
 
         if (terms == 1 && exp == 0) {
             printf("Funcao constante em y = %.2f.", (double)coe);
+            destroiPolinomio(&pol);
             return 0;
         }
 
         if (exp < 0) {
             printf("Erro: expoente negativo.");
+            destroiPolinomio(&pol);
             return 0;
         }
 
