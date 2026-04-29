@@ -74,11 +74,10 @@ void imprimirPolinomio(const Polinomio *pol) {
 }
 
 void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
-    // TODO: Remove it when the analisarPolinomio is implemented
-    // It makes the gcc don't care about the unused variables startRange and
-    // endRange
-    while (startRange < endRange && 0) {
-    }
+    // TODO: Remove these casts when startRange and endRange are used by
+    // analisarPolinomio.
+    (void)startRange;
+    (void)endRange;
 
     printf("Polinomio: ");
     imprimirPolinomio(pol);
