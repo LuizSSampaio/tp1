@@ -8,7 +8,7 @@ OBJS = aluno.o tp.o
 
 # Alvo principal
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) -lm
 
 # Regra para aluno.o
 aluno.o: aluno.c aluno.h

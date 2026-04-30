@@ -1,7 +1,7 @@
 #pragma once
 
 typedef struct {
-    int coeficiente;
+    double coeficiente;
     int expoente;
 } Termo;
 
@@ -18,4 +18,6 @@ void avaliarPolinomio(Polinomio self);
 
 Polinomio derivarPolinomio(Polinomio self);
 
-void analisarPolinomio(Polinomio self);
+void analisarPolinomio(Polinomio self, double startRange, double endRange);
+
+void imprimirDados(const Polinomio *pol, double startRange, double endRange);
