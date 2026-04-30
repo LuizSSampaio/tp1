@@ -4,7 +4,7 @@
 
 int main() {
     int terms;
-    if (scanf("%d", &terms) != 1) {
+    if (scanf("%d", &terms) != 1 || terms < 0) {
         printf("Falha ao ler a quantidade de termos\n");
         return -1;
     }
@@ -17,6 +17,12 @@ int main() {
             printf("Falha ao ler termos\n");
             destroiPolinomio(&pol);
             return -1;
+        }
+
+        if (terms == 1 && exp == 0) {
+            printf("Funcao constante em y = %.2f.", (double)coe);
+            destroiPolinomio(&pol);
+            return 0;
         }
 
         if (exp < 0) {
