@@ -26,9 +26,9 @@ double avaliarPolinomio(const Polinomio *self, double x);
 
 Polinomio derivarPolinomio(const Polinomio *self);
 
-void analisarPolinomio(const Polinomio *pol, const Polinomio *der,
-                       Intervalo *cresc, int *crescSize, Intervalo *decresc,
-                       int *decrescSize, Ponto *pontos, int *pontosSize,
-                       double startRange, double endRange);
+void analisarPolinomio(const Polinomio *pol, int maxSize, Intervalo *cresc,
+                       int *crescSize, Intervalo *decresc, int *decrescSize,
+                       Ponto *pontos, int *pontosSize, double startRange,
+                       double endRange);
 
 void imprimirDados(const Polinomio *pol, double startRange, double endRange);

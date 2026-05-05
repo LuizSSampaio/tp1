@@ -59,14 +59,115 @@ double avaliarPolinomio(const Polinomio *self, double x) {
     return result;
 }
 
-void analisarPolinomio(const Polinomio *pol, const Polinomio *der,
-                       Intervalo *cresc, int *crescSize, Intervalo *decresc,
-                       int *decrescSize, Ponto *pontos, int *pontosSize,
-                       double startRange, double endRange) {
+void adicionaPontoTransicao(Ponto *pontos, int *pontosSize, int capacidade,
+                            double start, double end) {
+    static const double eps = 1e-7;
+
+    if (*pontosSize >= capacidade) {
+        return;
+    }
+
+    if (*pontosSize > 0 && fabs(pontos[*pontosSize - 1].x - start) < eps &&
+        fabs(pontos[*pontosSize - 1].y - end) < eps) {
+        return;
+    }
+
+    pontos[*pontosSize].x = start;
+    pontos[*pontosSize].y = end;
+    (*pontosSize)++;
+}
+
+void analisarPolinomio(const Polinomio *pol, int maxSize, Intervalo *cresc,
+                       int *crescSize, Intervalo *decresc, int *decrescSize,
+                       Ponto *pontos, int *pontosSize, double startRange,
+                       double endRange) {
     static const double step = 0.1;
-    if (startRange < endRange)
-        analisarPolinomio(pol, der, cresc, crescSize, decresc, decrescSize,
-                          pontos, pontosSize, startRange + step, endRange);
+    static const double eps = 1e-7;
+    static int inicializado = 0;
+
+    if (!inicializado) {
+        *crescSize = 0;
+        *decrescSize = 0;
+        *pontosSize = 0;
+        inicializado = 1;
+    }
+
+    if (startRange >= endRange - eps) {
+        inicializado = 0;
+        return;
+    }
+
+    int capacidade = maxSize + 2;
+    double x = startRange;
+    double next = x + step;
+
+    if (next > endRange) {
+        next = endRange;
+    }
+
+    if (fabs(x) < eps) {
+        x = 0.0;
+    }
+    if (fabs(next) < eps) {
+        next = 0.0;
+    }
+
+    double dx = avaliarPolinomio(pol, x);
+    double dnext = avaliarPolinomio(pol, next);
+
+    int sinalX = 0;
+    int sinalNext = 0;
+
+    if (dx > eps) {
+        sinalX = 1;
+    } else if (dx < -eps) {
+        sinalX = -1;
+    }
+
+    if (dnext > eps) {
+        sinalNext = 1;
+    } else if (dnext < -eps) {
+        sinalNext = -1;
+    }
+
+    if (sinalX == 0) {
+        adicionaPontoTransicao(pontos, pontosSize, capacidade, x, x);
+    }
+
+    int sinalIntervalo = 0;
+    int deveUnir = 0;
+
+    if (sinalX == sinalNext) {
+        sinalIntervalo = sinalX;
+        deveUnir = 1;
+    } else if (sinalX == 0) {
+        sinalIntervalo = sinalNext;
+    } else if (sinalNext == 0) {
+        sinalIntervalo = sinalX;
+        deveUnir = 1;
+        adicionaPontoTransicao(pontos, pontosSize, capacidade, next, next);
+    } else {
+        adicionaPontoTransicao(pontos, pontosSize, capacidade, x, next);
+    }
+
+    if (sinalIntervalo != 0) {
+        Intervalo *intervalos = sinalIntervalo > 0 ? cresc : decresc;
+        int *intervalosSize = sinalIntervalo > 0 ? crescSize : decrescSize;
+
+        if (*intervalosSize < capacidade) {
+            if (deveUnir && *intervalosSize > 0 &&
+                fabs(intervalos[*intervalosSize - 1].end - x) < eps) {
+                intervalos[*intervalosSize - 1].end = next;
+            } else {
+                intervalos[*intervalosSize].start = x;
+                intervalos[*intervalosSize].end = next;
+                (*intervalosSize)++;
+            }
+        }
+    }
+
+    analisarPolinomio(pol, maxSize, cresc, crescSize, decresc, decrescSize,
+                      pontos, pontosSize, next, endRange);
 }
 
 void imprimirPolinomio(const Polinomio *pol) {
@@ -120,21 +221,21 @@ void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
     imprimirPolinomio(pol);
     printf("Derivada: ");
     imprimirPolinomio(&der);
-    destroiPolinomio(&der);
 
-    int maxSize = (endRange - startRange) / 0.1;
+    int maxSize = (endRange - startRange) / 0.1 + 2;
 
     Intervalo *cresc = malloc(sizeof(Intervalo) * maxSize);
-    int crescSize = maxSize;
+    int crescSize = 0;
 
     Intervalo *decresc = malloc(sizeof(Intervalo) * maxSize);
-    int decrescSize = maxSize;
+    int decrescSize = 0;
 
     Ponto *pontos = malloc(sizeof(Ponto) * maxSize);
-    int pontosSize = maxSize;
+    int pontosSize = 0;
 
-    analisarPolinomio(pol, &der, cresc, &crescSize, decresc, &decrescSize,
+    analisarPolinomio(&der, maxSize, cresc, &crescSize, decresc, &decrescSize,
                       pontos, &pontosSize, startRange, endRange);
+    destroiPolinomio(&der);
 
     printf("Intervalos de crescimento: ");
     imprimirIntervalo(cresc, crescSize);
@@ -144,4 +245,8 @@ void imprimirDados(const Polinomio *pol, double startRange, double endRange) {
 
     printf("Pontos de transicao: ");
     imprimirPonto(pontos, pontosSize);
+
+    free(cresc);
+    free(decresc);
+    free(pontos);
 }
